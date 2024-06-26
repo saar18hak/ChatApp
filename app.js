@@ -9,7 +9,13 @@ var authRouter = require('./src/routes/auth');
 var indexRouter = require('./src/routes/index');
 var usersRouter = require('./src/routes/users');
 var connectDB = require('./src/config/database');
+var cors=require('cors')
+var ejs = require('ejs');
 
+const corOptions={
+    origin:process.end.FRONTEND_URL,
+    optionsSucessStatus: 200
+}
 // Connect to the database
 connectDB();
 
@@ -20,7 +26,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs'); // Corrected this line
+
+// Use static files from the "public" directory
+//app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(sessionConfig);
 
 // Uncomment the following line to seed the database

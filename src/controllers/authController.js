@@ -1,9 +1,10 @@
 const UserDatabaseRepository = require("../repositories/userDatabaseRepository");
-const { comparePassword } = require("../services/hashingService");
+const { comparePassword,hashPassword } = require("../services/hashingService");
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body)
     const existingUser = await UserDatabaseRepository.getUserByEmail(email);
 
     if (!existingUser) {
@@ -63,12 +64,12 @@ const changepassword = async (req, res) => {
     }
 
     const match = await comparePassword(oldPassword, existingUser.password);
-
+    console.log(match)
     if (!match) {
       return res.status(400).send("Invalid credentials");
     }
-
-    existingUser.password = newPassword;
+    const hashedPassword=await hashPassword(newPassword)
+    existingUser.password = hashedPassword;
     await UserDatabaseRepository.updateUser(existingUser._id, existingUser);
 
     res.send("Password changed successfully");
@@ -83,6 +84,7 @@ const logout = async (req, res) => {
     if (err) {
       return res.status(500).send("Could not log out");
     }
+    res.clearCookie('connect.sid'); 
     res.send("Logged out successfully");
   });
 };
